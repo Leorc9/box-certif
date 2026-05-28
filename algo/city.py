@@ -6,5 +6,6 @@ class City():
 
     def __repr__(self):
         return f"City({self.longitude, self.latitude})"
+    
     def distance(self, other):
         return sqrt((other.longitude-self.longitude)**2 + (other.latitude-self.latitude)**2)
