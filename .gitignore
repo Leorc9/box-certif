@@ -1,0 +1,12 @@
+# PHP
+vendor/
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Divers
+.DS_Store
