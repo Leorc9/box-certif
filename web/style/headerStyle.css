@@ -27,3 +27,26 @@
     border-radius: 4px;
     font-weight: bold;
 }
+
+/* Responsive design */
+@media (max-width: 768px) {
+
+    .mainHeader {
+        height: auto;
+        padding: 15px 0;
+    }
+
+    .mainNav {
+        width: 90%;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .mainNav a {
+        font-size: 15px;
+    }
+
+    .authButton {
+        padding: 8px 22px;
+    }
+}
