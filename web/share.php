@@ -59,11 +59,10 @@ if (!$canSee) {
     exit();
 }
 
-// Only the owner can optimize — optimization rewrites visit_order in the DB
 $isOwner = ($sessionUserId !== null && $sessionUserId === $ownerId);
 
-// Optimize the trip route using the Python API (owner only)
-if ($isOwner && isset($_GET["action"]) && $_GET["action"] === "optimize") {
+// Optimize the trip route using the Python API
+if (isset($_GET["action"]) && $_GET["action"] === "optimize") {
     $stmtAll = $pdo->prepare("
         SELECT p.id, p.nom, p.latitude, p.longitude
         FROM places p
@@ -151,11 +150,9 @@ $places = $stmtPlaces->fetchAll(PDO::FETCH_ASSOC);
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h3 class="mb-0">Trip partagé : <?= htmlspecialchars($trip["name"]) ?></h3>
             <div class="d-flex align-items-center gap-2">
-                <?php if ($isOwner): ?>
-                    <a href="share.php?id=<?= $tripId ?>&action=optimize" class="btn btn-sm btn-success">
-                        Optimiser le trajet
-                    </a>
-                <?php endif; ?>
+                <a href="share.php?id=<?= $tripId ?>&action=optimize" class="btn btn-sm btn-success">
+                    Optimiser le trajet
+                </a>
                 <span class="badge bg-light text-primary fs-6">
                     <?= $hasPublic ? "Public" : "Privé" ?>
                 </span>
