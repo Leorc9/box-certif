@@ -39,3 +39,26 @@
     color: #0f1726;
     font-weight: bold;
 }
+
+@media (max-width: 768px) {
+    .homeContainer,
+    .tripContainer {
+        padding: 25px;
+    }
+
+    .homeCard {
+        flex-direction: column;
+        text-align: center;
+        gap: 25px;
+        padding: 25px;
+    }
+
+    .homeImage {
+        width: 100%;
+    }
+
+    .tripMessageCard {
+        margin: 40px auto;
+        padding: 25px;
+    }
+}
