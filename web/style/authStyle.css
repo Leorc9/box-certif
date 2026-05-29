@@ -1,0 +1,117 @@
+/* Main container for login and sign up pages */
+.authContainer {
+    min-height: calc(100vh - 75px);
+    background-color: #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Authentication card */
+.authCard {
+    width: 400px;
+    background-color: #f0f4ff;
+    padding: 32px;
+    border-radius: 28px;
+    box-shadow: 0 4px 5px rgba(0, 0, 0, 0.25);
+}
+
+/* Bigger card for sign up page */
+.signUpCard {
+    width: 430px;
+}
+
+/* Page title */
+.authCard h1 {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+/* Labels */
+.authCard label {
+    display: block;
+    margin-top: 14px;
+    margin-bottom: 8px;
+}
+
+/* Inputs */
+.authCard input {
+    width: 100%;
+    height: 34px;
+    padding: 8px 12px;
+    border: 1px solid #d2d2d2;
+    border-radius: 4px;
+}
+
+/* Submit button */
+.authCard button {
+    width: 100%;
+    height: 36px;
+    margin-top: 30px;
+    background-color: #0f1726;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* First name and last name row */
+.nameRow {
+    display: flex;
+    gap: 30px;
+}
+
+/* Error message */
+.errorMessage {
+    color: red;
+    text-align: center;
+    font-size: 13px;
+}
+
+/* Small text under forms */
+.smallText {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 12px;
+}
+
+.smallText a {
+    color: #0f1726;
+    font-weight: bold;
+    text-decoration: none;
+}
+/* Responsive design */
+@media (max-width: 600px) {
+    .authContainer {
+        min-height: calc(100vh - 60px);
+        padding: 20px;
+    }
+
+    .authCard,
+    .signUpCard {
+        width: 100%;
+        max-width: 400px;
+        padding: 24px;
+        border-radius: 20px;
+    }
+
+    .authCard h1 {
+        font-size: 24px;
+        margin-bottom: 22px;
+    }
+
+    .nameRow {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .authCard input {
+        height: 38px;
+        font-size: 14px;
+    }
+
+    .authCard button {
+        height: 40px;
+        font-size: 15px;
+    }
+}
