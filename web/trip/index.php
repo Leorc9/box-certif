@@ -36,17 +36,17 @@ $trips = $stmtTrips->fetchAll(PDO::FETCH_ASSOC);
 <div class="container mt-5">
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Créer un trip</h4>
+            <h4 class="mb-0">Create a trip</h4>
         </div>
 
         <div class="card-body">
             <form method="POST" action="">
                 <div class="mb-3">
-                    <label for="name" class="form-label">Titre du trip</label>
+                    <label for="name" class="form-label">Trip title</label>
                     <input type="text" class="form-control" id="name" name="name" required>
                 </div>
                 <button type="submit" class="btn btn-primary">
-                    Créer le trip
+                    Create trip
                 </button>
             </form>
         </div>
@@ -56,7 +56,7 @@ $trips = $stmtTrips->fetchAll(PDO::FETCH_ASSOC);
 <div class="container mt-4">
     <div class="card shadow-sm">
         <div class="card-header">
-            <h5 class="mb-0">Liste des trips</h5>
+            <h5 class="mb-0">My trips</h5>
         </div>
 
         <div class="card-body">
@@ -64,14 +64,14 @@ $trips = $stmtTrips->fetchAll(PDO::FETCH_ASSOC);
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Nom</th>
+                        <th>Name</th>
                         <th class="text-end">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($trips)): ?>
                         <tr>
-                            <td colspan="3" class="text-center text-muted">Aucun trip pour le moment.</td>
+                            <td colspan="3" class="text-center text-muted">No trips yet.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($trips as $trip): ?>
@@ -80,12 +80,12 @@ $trips = $stmtTrips->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?= htmlspecialchars($trip["name"]) ?></td>
                                 <td class="text-end">
                                     <a href="editTrip.php?id=<?= $trip["id"] ?>" class="btn btn-sm btn-primary">
-                                        Modifier
+                                        Edit
                                     </a>
                                     <a href="index.php?action=delete&id=<?= $trip["id"] ?>"
                                         class="btn btn-sm btn-danger"
-                                        onclick="return confirm('Supprimer ce trip ?')">
-                                        Supprimer
+                                        onclick="return confirm('Delete this trip?')">
+                                        Delete
                                     </a>
                                 </td>
                             </tr>

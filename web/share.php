@@ -11,7 +11,7 @@ $trip = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$trip) {
     http_response_code(404);
-    echo "<div class='container mt-5'><div class='alert alert-danger'>Trip introuvable.</div></div>";
+    echo "<div class='container mt-5'><div class='alert alert-danger'>Trip not found.</div></div>";
     exit();
 }
 
@@ -22,7 +22,7 @@ $shares = $stmtShares->fetchAll(PDO::FETCH_ASSOC);
 
 if (empty($shares)) {
     http_response_code(403);
-    echo "<div class='container mt-5'><div class='alert alert-warning'>Ce trip n'est pas partagé.</div></div>";
+    echo "<div class='container mt-5'><div class='alert alert-warning'>This trip is not shared.</div></div>";
     exit();
 }
 
@@ -55,7 +55,7 @@ if (!$canSee) {
         exit();
     }
     http_response_code(403);
-    echo "<div class='container mt-5'><div class='alert alert-danger'>Accès refusé.</div></div>";
+    echo "<div class='container mt-5'><div class='alert alert-danger'>Access denied.</div></div>";
     exit();
 }
 
@@ -148,13 +148,13 @@ $places = $stmtPlaces->fetchAll(PDO::FETCH_ASSOC);
 <div class="container mt-5">
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h3 class="mb-0">Trip partagé : <?= htmlspecialchars($trip["name"]) ?></h3>
+            <h3 class="mb-0">Shared trip: <?= htmlspecialchars($trip["name"]) ?></h3>
             <div class="d-flex align-items-center gap-2">
                 <a href="share.php?id=<?= $tripId ?>&action=optimize" class="btn btn-sm btn-success">
-                    Optimiser le trajet
+                    Optimize route
                 </a>
                 <span class="badge bg-light text-primary fs-6">
-                    <?= $hasPublic ? "Public" : "Privé" ?>
+                    <?= $hasPublic ? "Public" : "Private" ?>
                 </span>
             </div>
         </div>
@@ -193,7 +193,7 @@ $places = $stmtPlaces->fetchAll(PDO::FETCH_ASSOC);
 
             <?php if (!empty($trip["total_distance_km"])): ?>
                 <p class="lead">
-                    Distance totale :
+                    Total distance:
                     <strong><?= number_format((float) $trip["total_distance_km"], 1) ?> km</strong>
                 </p>
             <?php endif; ?>
@@ -201,8 +201,8 @@ $places = $stmtPlaces->fetchAll(PDO::FETCH_ASSOC);
             <table class="table table-striped table-hover align-middle fs-5">
                 <thead class="table-dark">
                     <tr>
-                        <th>Ordre</th>
-                        <th>Ville</th>
+                        <th>Order</th>
+                        <th>City</th>
                         <th>Latitude</th>
                         <th>Longitude</th>
                     </tr>
@@ -210,7 +210,7 @@ $places = $stmtPlaces->fetchAll(PDO::FETCH_ASSOC);
                 <tbody>
                     <?php if (empty($places)): ?>
                         <tr>
-                            <td colspan="4" class="text-center text-muted">Aucune étape pour ce trip.</td>
+                            <td colspan="4" class="text-center text-muted">No stops for this trip.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($places as $place): ?>

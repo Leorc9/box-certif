@@ -33,14 +33,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if ($publicRow) {
                 $stmt = $pdo->prepare("DELETE FROM shares WHERE id = ?");
                 $stmt->execute([$publicRow["id"]]);
-                $message = "Lien public retiré.";
+                $message = "Public link removed.";
             } else {
                 $stmt = $pdo->prepare(
                     "INSERT INTO shares (trip_id, shared_with_user_id, visibility)
                      VALUES (?, NULL, 'public')"
                 );
                 $stmt->execute([$tripId]);
-                $message = "Trip rendu public.";
+                $message = "Trip made public.";
             }
         }
 
@@ -49,16 +49,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $email = trim($_POST["email"] ?? "");
 
             if ($email === "") {
-                $error = "Email requis.";
+                $error = "Email required.";
             } else {
                 $stmtUser = $pdo->prepare("SELECT id FROM users WHERE email = ?");
                 $stmtUser->execute([$email]);
                 $targetUser = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
                 if (!$targetUser) {
-                    $error = "Aucun utilisateur trouvé avec cet email.";
+                    $error = "No user found with this email.";
                 } elseif ((int) $targetUser["id"] === $userId) {
-                    $error = "Tu ne peux pas te partager un trip à toi-même.";
+                    $error = "You cannot share a trip with yourself.";
                 } else {
                     // Upsert: avoids a "Duplicate entry" error if the trip
                     // is already shared with this user (UNIQUE key on
@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                          ON DUPLICATE KEY UPDATE visibility = 'private'"
                     );
                     $stmtInsert->execute([$tripId, $targetUser["id"]]);
-                    $message = "Partage privé ajouté pour " . $email . ".";
+                    $message = "Private share added for " . $email . ".";
                 }
             }
         }
@@ -84,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                  WHERE s.id = ? AND t.user_id = ?"
             );
             $stmt->execute([$shareId, $userId]);
-            $message = "Partage retiré.";
+            $message = "Share removed.";
         }
     }
 }
@@ -119,7 +119,7 @@ $baseUrl  = "http://" . $_SERVER["HTTP_HOST"] . $basePath . "/share.php";
 <div class="container mt-5">
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Partager mes trips</h4>
+            <h4 class="mb-0">Share my trips</h4>
         </div>
 
         <div class="card-body">
@@ -131,7 +131,7 @@ $baseUrl  = "http://" . $_SERVER["HTTP_HOST"] . $basePath . "/share.php";
             <?php endif; ?>
 
             <?php if (empty($trips)): ?>
-                <p class="text-muted">Tu n'as encore aucun trip.</p>
+                <p class="text-muted">You don't have any trips yet.</p>
             <?php else: ?>
                 <?php foreach ($trips as $trip): ?>
                     <?php
@@ -155,15 +155,15 @@ $baseUrl  = "http://" . $_SERVER["HTTP_HOST"] . $basePath . "/share.php";
                             <?php if ($publicShare): ?>
                                 <span class="badge bg-success">Public</span>
                             <?php elseif (!empty($privateShares)): ?>
-                                <span class="badge bg-warning text-dark">Privé</span>
+                                <span class="badge bg-warning text-dark">Private</span>
                             <?php else: ?>
-                                <span class="badge bg-secondary">Non partagé</span>
+                                <span class="badge bg-secondary">Not shared</span>
                             <?php endif; ?>
                         </div>
 
                         <div class="card-body">
                             <p class="mb-2">
-                                Lien :
+                                Link:
                                 <a href="<?= htmlspecialchars($shareUrl) ?>" target="_blank">
                                     <?= htmlspecialchars($shareUrl) ?>
                                 </a>
@@ -175,11 +175,11 @@ $baseUrl  = "http://" . $_SERVER["HTTP_HOST"] . $basePath . "/share.php";
                                 <input type="hidden" name="action" value="togglePublic">
                                 <?php if ($publicShare): ?>
                                     <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        Retirer le lien public
+                                        Remove public link
                                     </button>
                                 <?php else: ?>
                                     <button type="submit" class="btn btn-sm btn-success">
-                                        Rendre public
+                                        Make public
                                     </button>
                                 <?php endif; ?>
                             </form>
@@ -191,18 +191,18 @@ $baseUrl  = "http://" . $_SERVER["HTTP_HOST"] . $basePath . "/share.php";
                                 <input type="hidden" name="tripId" value="<?= $trip["id"] ?>">
                                 <input type="hidden" name="action" value="addPrivate">
                                 <div class="col-md-8">
-                                    <label class="form-label mb-0">Partager en privé avec (email) :</label>
+                                    <label class="form-label mb-0">Share privately with (email):</label>
                                     <input type="email" name="email" class="form-control" required>
                                 </div>
                                 <div class="col-md-4">
                                     <button type="submit" class="btn btn-warning w-100">
-                                        Partager en privé
+                                        Share privately
                                     </button>
                                 </div>
                             </form>
 
                             <?php if (!empty($privateShares)): ?>
-                                <p class="mt-3 mb-1"><strong>Partagé en privé avec :</strong></p>
+                                <p class="mt-3 mb-1"><strong>Privately shared with:</strong></p>
                                 <ul class="list-group">
                                     <?php foreach ($privateShares as $privShare): ?>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -212,7 +212,7 @@ $baseUrl  = "http://" . $_SERVER["HTTP_HOST"] . $basePath . "/share.php";
                                                 <input type="hidden" name="action" value="removeShare">
                                                 <input type="hidden" name="shareId" value="<?= $privShare["id"] ?>">
                                                 <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                    Retirer
+                                                    Remove
                                                 </button>
                                             </form>
                                         </li>
