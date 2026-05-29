@@ -15,7 +15,7 @@ if (session_status() === PHP_SESSION_NONE) {
         <!-- Main navigation links -->
         <a href="/index.php">Home</a>
         <a href="/trip/index.php">Trip</a>
-        <a href="#">History</a>
+        <a href="/shareLink.php">Share a trip</a>
 
         <!-- If the user is connected, show Log Out, else show Log In -->
         <?php if (isset($_SESSION["id"])) { ?>
