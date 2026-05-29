@@ -59,6 +59,81 @@ if (!$canSee) {
     exit();
 }
 
+// Only the owner can optimize — optimization rewrites visit_order in the DB
+$isOwner = ($sessionUserId !== null && $sessionUserId === $ownerId);
+
+// Optimize the trip route using the Python API (owner only)
+if ($isOwner && isset($_GET["action"]) && $_GET["action"] === "optimize") {
+    $stmtAll = $pdo->prepare("
+        SELECT p.id, p.nom, p.latitude, p.longitude
+        FROM places p
+        JOIN trip_places tp ON tp.place_id = p.id
+        WHERE tp.trip_id = ?
+        ORDER BY tp.visit_order ASC
+    ");
+    $stmtAll->execute([$tripId]);
+    $placesToOptimize = $stmtAll->fetchAll(PDO::FETCH_ASSOC);
+
+    if (count($placesToOptimize) < 2) {
+        $_SESSION["optimizeError"] = "Add at least 2 cities before optimizing.";
+    } else {
+        $payload = json_encode([
+            "places" => array_map(fn($p) => [
+                "name"      => $p["nom"],
+                "latitude"  => (float) $p["latitude"],
+                "longitude" => (float) $p["longitude"],
+            ], $placesToOptimize)
+        ]);
+
+        $ch = curl_init("http://127.0.0.1:8000/optimize");
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        unset($ch);
+
+        if ($response && $httpCode === 200) {
+            $result = json_decode($response, true);
+
+            // Map city name → place id to update visit_order
+            $nameToId = array_column($placesToOptimize, "id", "nom");
+
+            // Update visit_order: hotel first, then its day-trip cities
+            $order = 1;
+            $stmtUpdateOrder = $pdo->prepare("UPDATE trip_places SET visit_order = ? WHERE trip_id = ? AND place_id = ?");
+            foreach ($result["clusters"] as $cluster) {
+                if (isset($nameToId[$cluster["hotel"]])) {
+                    $stmtUpdateOrder->execute([$order++, $tripId, $nameToId[$cluster["hotel"]]]);
+                }
+                foreach ($cluster["dayTrips"] as $dayTripName) {
+                    if (isset($nameToId[$dayTripName])) {
+                        $stmtUpdateOrder->execute([$order++, $tripId, $nameToId[$dayTripName]]);
+                    }
+                }
+            }
+
+            // Save total distance in the trip row
+            $stmtDist = $pdo->prepare("UPDATE trip SET total_distance_km = ? WHERE id = ?");
+            $stmtDist->execute([$result["totalDistance"], $tripId]);
+
+            $_SESSION["optimizeResult"] = $result;
+        } else {
+            $_SESSION["optimizeError"] = "Optimization API is unreachable. Make sure the Python server is running.";
+        }
+    }
+
+    header("Location: share.php?id=$tripId");
+    exit();
+}
+
+// Read and clear flash messages from session
+$optimizeResult = $_SESSION["optimizeResult"] ?? null;
+$optimizeError  = $_SESSION["optimizeError"]  ?? null;
+unset($_SESSION["optimizeResult"], $_SESSION["optimizeError"]);
+
 // Fetch every place of the trip, ordered by visit order.
 $stmtPlaces = $pdo->prepare("
     SELECT p.*, tp.visit_order
@@ -75,12 +150,50 @@ $places = $stmtPlaces->fetchAll(PDO::FETCH_ASSOC);
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h3 class="mb-0">Trip partagé : <?= htmlspecialchars($trip["name"]) ?></h3>
-            <span class="badge bg-light text-primary fs-6">
-                <?= $hasPublic ? "Public" : "Privé" ?>
-            </span>
+            <div class="d-flex align-items-center gap-2">
+                <?php if ($isOwner): ?>
+                    <a href="share.php?id=<?= $tripId ?>&action=optimize" class="btn btn-sm btn-success">
+                        Optimiser le trajet
+                    </a>
+                <?php endif; ?>
+                <span class="badge bg-light text-primary fs-6">
+                    <?= $hasPublic ? "Public" : "Privé" ?>
+                </span>
+            </div>
         </div>
 
         <div class="card-body">
+            <?php if ($optimizeError): ?>
+                <div class="alert alert-danger"><?= htmlspecialchars($optimizeError) ?></div>
+            <?php endif; ?>
+
+            <?php if ($optimizeResult): ?>
+                <?php
+                    $fullCityList = [];
+                    foreach ($optimizeResult["clusters"] as $cluster) {
+                        $fullCityList[] = ["name" => $cluster["hotel"], "isHotel" => true];
+                        foreach ($cluster["dayTrips"] as $dayTrip) {
+                            $fullCityList[] = ["name" => $dayTrip, "isHotel" => false];
+                        }
+                    }
+                    $firstCity = $fullCityList[0]["name"] ?? "";
+                ?>
+                <div class="alert alert-success">
+                    <strong>Route optimized!</strong> — Total: <?= $optimizeResult["totalDistance"] ?> km
+                    <ol class="mb-0 mt-2">
+                        <?php foreach ($fullCityList as $city): ?>
+                            <li>
+                                <?= htmlspecialchars($city["name"]) ?>
+                                <?php if ($city["isHotel"]): ?>
+                                    <span class="badge bg-primary ms-1">hotel</span>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                        <li class="text-muted fst-italic">Return to <?= htmlspecialchars($firstCity) ?></li>
+                    </ol>
+                </div>
+            <?php endif; ?>
+
             <?php if (!empty($trip["total_distance_km"])): ?>
                 <p class="lead">
                     Distance totale :
