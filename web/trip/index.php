@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmtInsert = $pdo->prepare("INSERT INTO trip (name, user_id) VALUES (?, ?)");
         $stmtInsert->execute([$tripName, $userId]);
     }
-    header("Location: trips.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -23,7 +23,7 @@ if (isset($_GET["action"]) && $_GET["action"] === "delete" && isset($_GET["id"])
     $tripId = (int) $_GET["id"];
     $stmtDelete = $pdo->prepare("DELETE FROM trip WHERE id = ? AND user_id = ?");
     $stmtDelete->execute([$tripId, $userId]);
-    header("Location: trips.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -82,7 +82,7 @@ $trips = $stmtTrips->fetchAll(PDO::FETCH_ASSOC);
                                     <a href="editTrip.php?id=<?= $trip["id"] ?>" class="btn btn-sm btn-primary">
                                         Modifier
                                     </a>
-                                    <a href="trips.php?action=delete&id=<?= $trip["id"] ?>"
+                                    <a href="index.php?action=delete&id=<?= $trip["id"] ?>"
                                         class="btn btn-sm btn-danger"
                                         onclick="return confirm('Supprimer ce trip ?')">
                                         Supprimer

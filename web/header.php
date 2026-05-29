@@ -14,7 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <nav class="mainNav">
         <!-- Main navigation links -->
         <a href="/index.php">Home</a>
-        <a href="#">Trip</a>
+        <a href="/trip/index.php">Trip</a>
         <a href="#">History</a>
 
         <!-- If the user is connected, show Log Out, else show Log In -->

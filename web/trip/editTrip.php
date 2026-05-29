@@ -17,7 +17,7 @@ $stmt->execute([$tripId, $userId]);
 $trip = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$trip) {
-    header("Location: trips.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -95,7 +95,7 @@ $places = $stmtPlaces->fetchAll(PDO::FETCH_ASSOC);
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Modifier le trip : <?= htmlspecialchars($trip["name"]) ?></h4>
-            <a href="trips.php" class="btn btn-sm btn-light">← Retour</a>
+            <a href="index.php" class="btn btn-sm btn-light">← Retour</a>
         </div>
 
         <div class="card-body">
@@ -140,19 +140,19 @@ $places = $stmtPlaces->fetchAll(PDO::FETCH_ASSOC);
                         </tr>
                     <?php else: ?>
                         <?php foreach ($places as $place): ?>
-                        <tr>
-                            <td><?= $place["visit_order"] ?></td>
-                            <td><?= htmlspecialchars($place["nom"]) ?></td>
-                            <td><?= $place["latitude"] ?></td>
-                            <td><?= $place["longitude"] ?></td>
-                            <td class="text-end">
-                                <a href="?id=<?= $tripId ?>&action=remove&place_id=<?= $place["id"] ?>"
-                                   class="btn btn-sm btn-danger"
-                                   onclick="return confirm('Retirer cette étape ?')">
-                                    Retirer
-                                </a>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td><?= $place["visit_order"] ?></td>
+                                <td><?= htmlspecialchars($place["nom"]) ?></td>
+                                <td><?= $place["latitude"] ?></td>
+                                <td><?= $place["longitude"] ?></td>
+                                <td class="text-end">
+                                    <a href="?id=<?= $tripId ?>&action=remove&place_id=<?= $place["id"] ?>"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Retirer cette étape ?')">
+                                        Retirer
+                                    </a>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </tbody>
