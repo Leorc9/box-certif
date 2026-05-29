@@ -1,11 +1,9 @@
 <?php
 require_once("../header.php");
 require_once("../config/database.php");
+require_once("../functions/loginCheck.php");
 
-if (!isset($_SESSION["id"])) {
-    header("Location: ../index.php");
-    exit();
-}
+checkLogin();
 
 $userId = $_SESSION["id"];
 
@@ -77,20 +75,20 @@ $trips = $stmtTrips->fetchAll(PDO::FETCH_ASSOC);
                         </tr>
                     <?php else: ?>
                         <?php foreach ($trips as $trip): ?>
-                        <tr>
-                            <td><?= $trip["id"] ?></td>
-                            <td><?= htmlspecialchars($trip["name"]) ?></td>
-                            <td class="text-end">
-                                <a href="editTrip.php?id=<?= $trip["id"] ?>" class="btn btn-sm btn-primary">
-                                    Modifier
-                                </a>
-                                <a href="trips.php?action=delete&id=<?= $trip["id"] ?>"
-                                   class="btn btn-sm btn-danger"
-                                   onclick="return confirm('Supprimer ce trip ?')">
-                                    Supprimer
-                                </a>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td><?= $trip["id"] ?></td>
+                                <td><?= htmlspecialchars($trip["name"]) ?></td>
+                                <td class="text-end">
+                                    <a href="editTrip.php?id=<?= $trip["id"] ?>" class="btn btn-sm btn-primary">
+                                        Modifier
+                                    </a>
+                                    <a href="trips.php?action=delete&id=<?= $trip["id"] ?>"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Supprimer ce trip ?')">
+                                        Supprimer
+                                    </a>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </tbody>
